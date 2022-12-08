@@ -42,7 +42,6 @@
                              (aref trees l (1+ r))
                              (aref (aref visibility l (1+ r)) 1))))
                  ))
-  (print visibility)
   (loop for l from 1 upto lc summing
                              (loop for r from 1 upto rc counting (find-if (lambda (x) (< x (aref trees l r)))
                                                                           (aref visibility l r)))))
