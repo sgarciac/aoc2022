@@ -1,5 +1,6 @@
-(defconstant +input+ "input.txt")
+(defconstant +input+ "sample")
 
+;; part1 O(n)
 (let*
     ((lines (with-open-file (stream +input+) (loop for line = (read-line stream nil) while (not (zerop (length line))) collecting line)))
      (lc (length lines))
@@ -45,3 +46,28 @@
   (loop for l from 1 upto lc summing
                              (loop for r from 1 upto rc counting (find-if (lambda (x) (< x (aref trees l r)))
                                                                           (aref visibility l r)))))
+
+;; part2
+(defun scenic (trees lc rc l r)
+  (let ((tree (aref trees l r)))
+    (*
+     (loop for ri from (1+ r) to (1- rc)
+           do (when (>= (aref trees l ri) tree) (return (1+ c))) counting t into c finally (return c))
+     (loop for ri from (1- r) downto 0
+           do (when (>= (aref trees l ri) tree) (return (1+ c))) counting t into c finally (return c))
+     (loop for li from (1+ l) to (1- lc)
+           do (when (>= (aref trees li r) tree) (return (1+ c))) counting t into c finally (return c))
+     (loop for li from (1- l) downto 0
+           do (when (>= (aref trees li r) tree) (return (1+ c))) counting t into c finally (return c)))))
+
+(let*
+    ((lines (with-open-file (stream "input.txt") (loop for line = (read-line stream nil) while (not (zerop (length line))) collecting line)))
+     (lc (length lines))
+     (rc (length (first lines)))
+     (trees (make-array (list lc rc))))
+  ;; load trees
+  (loop for l from 0 to (1- lc) for line in lines
+        do (loop for r from 0 to (1- rc) do (setf (aref trees l r) (digit-char-p (char line r)))))
+  (loop for l from 0 to (1- lc) for line in lines
+        maximizing (loop for r from 0 to (1- rc) maximizing
+                                                 (scenic trees lc rc l r))))
